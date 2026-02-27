@@ -1,0 +1,9 @@
+/node_modules
+/dist
+
+# Ignore environment variable files
+.env
+.env.*
+!.env.example
+
+
