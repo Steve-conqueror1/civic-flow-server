@@ -7,6 +7,7 @@ export interface CreateUserData {
   firstName: string;
   lastName: string;
   phoneNumber?: string;
+  address?: string;
 }
 
 export type UserRow = InferSelectModel<typeof users>;

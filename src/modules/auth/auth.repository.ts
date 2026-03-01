@@ -32,6 +32,7 @@ export async function createUser(data: CreateUserData): Promise<SafeUser> {
       firstName: data.firstName,
       lastName: data.lastName,
       phoneNumber: data.phoneNumber,
+      address: data.address,
     })
     .returning();
   const { passwordHash: _, ...safeUser } = result[0];
@@ -102,18 +103,12 @@ export async function upsertMfaSecret(
   userId: string,
   totpSecret: string,
 ): Promise<void> {
-  await db
-    .insert(userMfa)
-    .values({ userId, totpSecret })
-    .onConflictDoUpdate({
-      target: userMfa.userId,
-      set: { totpSecret },
-    });
+  await db.insert(userMfa).values({ userId, totpSecret }).onConflictDoUpdate({
+    target: userMfa.userId,
+    set: { totpSecret },
+  });
 }
 
 export async function enableMfa(userId: string): Promise<void> {
-  await db
-    .update(users)
-    .set({ mfaEnabled: true })
-    .where(eq(users.id, userId));
+  await db.update(users).set({ mfaEnabled: true }).where(eq(users.id, userId));
 }

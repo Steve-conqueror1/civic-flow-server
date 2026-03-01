@@ -80,6 +80,7 @@ export async function register(body: RegisterBody): Promise<SafeUser> {
     firstName: body.firstName,
     lastName: body.lastName,
     phoneNumber: body.phoneNumber,
+    address: body.address,
   });
 
   const token = randomUUID();

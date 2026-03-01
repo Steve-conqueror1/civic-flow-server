@@ -30,6 +30,7 @@ export const users = pgTable(
     firstName: varchar("first_name", { length: 100 }).notNull(),
     lastName: varchar("last_name", { length: 100 }).notNull(),
     phoneNumber: varchar("phone_number", { length: 20 }),
+    address: text("address"),
 
     role: userRoleEnum("role").notNull().default("citizen"),
 
