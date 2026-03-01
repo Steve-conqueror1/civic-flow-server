@@ -1,5 +1,4 @@
 import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
-
 import { users } from "../users/users.schema";
 
 export const userMfa = pgTable("user_mfa", {

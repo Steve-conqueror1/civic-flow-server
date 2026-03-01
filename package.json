@@ -4,14 +4,15 @@
   "description": "backend server for civic flow web app",
   "license": "ISC",
   "author": "Stephen",
-  "type": "module",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec tsx src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "drizzle:generate": "npx drizzle-kit generate",
-    "drizzle:migrate": "npx drizzle-kit migrate"
+    "drizzle:migrate": "npx drizzle-kit migrate",
+    "docker:run": "docker compose up -d --build",
+    "docker:stop": "docker compose down"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
