@@ -6,6 +6,7 @@ export const RegisterBodySchema = z.object({
   firstName: z.string().min(1).max(100),
   lastName: z.string().min(1).max(100),
   phoneNumber: z.string().optional(),
+  address: z.string().min(5).max(255).optional(),
 });
 
 export const LoginBodySchema = z.object({
