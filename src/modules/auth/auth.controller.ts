@@ -4,6 +4,7 @@ import {
   RegisterBodySchema,
   LoginBodySchema,
   MfaVerifyBodySchema,
+  MfaConfirmBodySchema,
   ResendVerificationBodySchema,
   RequestPasswordResetBodySchema,
   ResetPasswordBodySchema,
@@ -328,6 +329,60 @@ export const requestPasswordResetHandler = async (
       success: true,
       message:
         "If an account with that email exists, a password reset link has been sent.",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * @route   POST /api/auth/mfa/setup
+ * @desc    Initiate MFA setup — generates a TOTP secret and returns an otpauth:// URI
+ * @access  Authenticated
+ */
+export const setupMfaHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { uri, secret } = await authService.setupMfa(req.user!.sub);
+    res.status(200).json({
+      success: true,
+      message:
+        "Scan the QR code with your authenticator app, then confirm with POST /auth/mfa/confirm.",
+      data: { uri, secret },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * @route   POST /api/auth/mfa/confirm
+ * @desc    Confirm MFA setup by verifying a TOTP code — enables MFA on the account
+ * @access  Authenticated
+ */
+export const confirmMfaHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const parsed = MfaConfirmBodySchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: parsed.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    await authService.confirmMfa(req.user!.sub, parsed.data.totpCode);
+    res.status(200).json({
+      success: true,
+      message: "MFA has been enabled on your account.",
     });
   } catch (err) {
     next(err);

@@ -97,3 +97,23 @@ export async function updatePassword(
     })
     .where(eq(users.id, userId));
 }
+
+export async function upsertMfaSecret(
+  userId: string,
+  totpSecret: string,
+): Promise<void> {
+  await db
+    .insert(userMfa)
+    .values({ userId, totpSecret })
+    .onConflictDoUpdate({
+      target: userMfa.userId,
+      set: { totpSecret },
+    });
+}
+
+export async function enableMfa(userId: string): Promise<void> {
+  await db
+    .update(users)
+    .set({ mfaEnabled: true })
+    .where(eq(users.id, userId));
+}

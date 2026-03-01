@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { env } from "../config/env";
-import type { JwtAccessPayload } from "../modules/auth/auth.types";
+import type { JwtAccessPayload } from "../types";
 
 export const authenticate = (
   req: Request,
@@ -22,14 +22,14 @@ export const authenticate = (
     req.user = payload;
     next();
   } catch (err) {
-    if (err instanceof TokenExpiredError) {
+    if (err instanceof jwt.TokenExpiredError) {
       res.status(401).json({
         success: false,
         message: "Session expired. Please log in again.",
       });
       return;
     }
-    if (err instanceof JsonWebTokenError) {
+    if (err instanceof jwt.JsonWebTokenError) {
       res.status(401).json({
         success: false,
         message: "Invalid authentication token.",

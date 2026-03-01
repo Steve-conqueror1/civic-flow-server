@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import type { JwtAccessPayload } from "../modules/auth/auth.types";
+import type { JwtAccessPayload } from "../types";
 
 type UserRole = JwtAccessPayload["role"];
 

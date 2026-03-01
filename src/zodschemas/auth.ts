@@ -31,6 +31,10 @@ export const ResetPasswordBodySchema = z.object({
   password: z.string().min(8).max(128),
 });
 
+export const MfaConfirmBodySchema = z.object({
+  totpCode: z.string().length(6),
+});
+
 // ---------------------------------------------------------------------------
 // Inferred types
 // ---------------------------------------------------------------------------
@@ -38,6 +42,7 @@ export const ResetPasswordBodySchema = z.object({
 export type RegisterBody = z.infer<typeof RegisterBodySchema>;
 export type LoginBody = z.infer<typeof LoginBodySchema>;
 export type MfaVerifyBody = z.infer<typeof MfaVerifyBodySchema>;
+export type MfaConfirmBody = z.infer<typeof MfaConfirmBodySchema>;
 export type ResendVerificationBody = z.infer<
   typeof ResendVerificationBodySchema
 >;

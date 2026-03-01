@@ -1,7 +1,12 @@
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { TOTP, NobleCryptoPlugin, ScureBase32Plugin } from "otplib";
+import {
+  TOTP,
+  NobleCryptoPlugin,
+  ScureBase32Plugin,
+  generateSecret,
+} from "otplib";
 import { env } from "../../config/env";
 import { redisClient } from "../../config/redis";
 import { sendEmail } from "../../utils/email";
@@ -298,4 +303,58 @@ export async function resetPassword(
   const passwordHash = await bcrypt.hash(newPassword, 12);
   await authRepo.updatePassword(userId, passwordHash);
   await redisClient.del(`pwd_reset:${token}`);
+}
+
+export async function setupMfa(
+  userId: string,
+): Promise<{ uri: string; secret: string }> {
+  const user = await authRepo.findUserById(userId);
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
+
+  const secret = generateSecret();
+
+  // Store the pending secret in Redis for 10 minutes — only written to DB
+  // after the user confirms with a valid TOTP code.
+  await redisClient.set(`mfa_setup:${userId}`, secret, { EX: 600 });
+
+  const uri = [
+    `otpauth://totp/`,
+    `${encodeURIComponent(`CivicFlow:${user.email}`)}`,
+    `?secret=${secret}`,
+    `&issuer=${encodeURIComponent("CivicFlow")}`,
+    `&algorithm=SHA1`,
+    `&digits=6`,
+    `&period=30`,
+  ].join("");
+
+  return { uri, secret };
+}
+
+export async function confirmMfa(
+  userId: string,
+  totpCode: string,
+): Promise<void> {
+  const secret = await redisClient.get(`mfa_setup:${userId}`);
+  if (!secret) {
+    throw new AppError(
+      400,
+      "No MFA setup in progress. Please call /auth/mfa/setup first.",
+    );
+  }
+
+  const totpInstance = new TOTP({
+    secret,
+    crypto: new NobleCryptoPlugin(),
+    base32: new ScureBase32Plugin(),
+  });
+  const result = await totpInstance.verify(totpCode);
+  if (!result.valid) {
+    throw new AppError(401, "Invalid MFA code");
+  }
+
+  await authRepo.upsertMfaSecret(userId, secret);
+  await authRepo.enableMfa(userId);
+  await redisClient.del(`mfa_setup:${userId}`);
 }
