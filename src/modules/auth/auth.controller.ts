@@ -390,6 +390,28 @@ export const confirmMfaHandler = async (
 };
 
 /**
+ * @route   POST /api/auth/me
+ * @desc   Get the currently authenticated user's information
+ * @access  Public (but requires valid access token)
+ */
+export const getCurrentUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = await authService.getCurrentUser(req.user!.sub);
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
  * @route   POST /api/auth/reset-password
  * @desc    Reset a user's password using the token sent in the password reset email.
  * @access  Public

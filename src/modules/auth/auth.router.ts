@@ -11,6 +11,7 @@ import {
   resetPasswordHandler,
   setupMfaHandler,
   confirmMfaHandler,
+  getCurrentUser,
 } from "./auth.controller";
 import { authenticate } from "../../middleware/auth.middleware";
 
@@ -29,6 +30,8 @@ router.post("/auth/reset-password", resetPasswordHandler);
 // Authenticated routes
 router.post("/auth/mfa/setup", authenticate, setupMfaHandler);
 router.post("/auth/mfa/confirm", authenticate, confirmMfaHandler);
+router.get("/auth/me", authenticate, getCurrentUser);
+
 router.post("/auth/logout", logoutHandler);
 
 export default router;

@@ -359,3 +359,11 @@ export async function confirmMfa(
   await authRepo.enableMfa(userId);
   await redisClient.del(`mfa_setup:${userId}`);
 }
+
+export async function getCurrentUser(userId: string): Promise<SafeUser> {
+  const user = await authRepo.findUserById(userId);
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
+  return user;
+}
