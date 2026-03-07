@@ -66,7 +66,7 @@ Planned but mostly stubbed. Intended structure:
 ### RBAC
 
 Five roles defined in `users.schema.ts` (ascending privilege):
-`citizen` → `government_employee` → `department_head` → `ministry_official` → `admin`
+`citizen` → `admin` -> `super_admin`
 
 Role enforcement will go in `src/middleware/rabc.middleware.ts` (note: filename has a typo — `rabc` instead of `rbac`).
 

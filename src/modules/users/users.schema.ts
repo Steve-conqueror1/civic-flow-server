@@ -13,10 +13,8 @@ import {
 
 export const userRoleEnum = pgEnum("user_role", [
   "citizen",
-  "government_employee",
-  "department_head",
-  "ministry_official",
   "admin",
+  "super_admin",
 ]);
 
 export const users = pgTable(

@@ -30,8 +30,8 @@ router.post("/auth/reset-password", resetPasswordHandler);
 // Authenticated routes
 router.post("/auth/mfa/setup", authenticate, setupMfaHandler);
 router.post("/auth/mfa/confirm", authenticate, confirmMfaHandler);
-router.get("/auth/me", authenticate, getCurrentUser);
 
+router.get("/auth/me", authenticate, getCurrentUser);
 router.post("/auth/logout", logoutHandler);
 
 export default router;
