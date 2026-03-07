@@ -1,19 +1,20 @@
 ---
-description: Create a backend feature spec file and git branch for CivicFlow API
-argument-hint: Short backend feature description (e.g., "add citizen request attachment support")
-allowed-tools: Read, Write, Glob, Bash(git switch:*)
+description: Create a feature spec file and git branch from a short idea
+argument-hint: Short feature description (e.g., "add citizen request attachment support")
+allowed-tools: Read, Write, Glob, Bash(git checkout -b:*), Bash(touch:*)
 ---
 
-You are helping to spin a new feature for CivicFlow API app from a short idea provided in the user input below.
+You are helping to spin up a new feature spec for this application, from a short idea provided in the user input below. Always adhere to any rules or requirements set out in any CLAUDE.md files when responding.
 
 User input: $ARGUMENTS
 
 ## High level behavior
 
-Your job is to turn a feature idea into:
+Your job will be to turn the user input above into:
 
-- A structured backend specification and a clean Git environment. Always adhere to the architecture defined in CLAUDE.md (Router -> Controller -> Service -> Repository).
-- A detailed markdown spec file inder \_specs/ directory
+- A human friendly feature title in kebab-case
+- A safe git branch name not already taken (e.g. claude/feature/feature-name)
+- A detailed markdown spec file under the \_specs/ directory
 
 Then save the spec file to disk and print a short summary of what you did.
 
@@ -31,63 +32,18 @@ From `$ARGUMENTS`, extract:
 
 ## Step 3. Branch Management
 
-Switch to a new Git branch using `branch_name`. If the branch exists, append a suffix (e.g., `-v2`).
+Before making any content, switch to a new Git branch using `branch_name`. If the branch exists, append a suffix (e.g., `-v2`).
 
 ## Step 4. Draft the Spec Content
 
-Create a markdown file at `_specs/<feature_slug>.md`. Use the following backend-centric structure:
+Create a markdown spec document that Plan mode can use directly and save it in the \_specs folder using the `feature_slug`. Use the exact structure as defined in the spec template file here: @\_specs/template.md. Do not add technical implementation details such as code examples.
 
-# Spec: [feature_title]
+## Step 5. Final output to the user
 
-## Overview
-
-Brief description of the business value for the CivicFlow platform.
-
-## Functional Requirements
-
-- ...
-
-## Proposed API Changes
-
-### Endpoints
-
-- **Method**: (GET/POST/PATCH/DELETE)
-- **Path**: `/api/...`
-- **Auth/RBAC**: Required role (citizen, admin, etc.)
-
-### Schema Requirements
-
-- Identify existing Drizzle tables to be used (Note: Schema modification is restricted).
-- List Zod validation requirements for request bodies.
-
-## Logic Flow
-
-1. **Controller**: What inputs are captured?
-2. **Service**: What business rules are applied? (e.g., "Verify user owns the request before attachment").
-3. **Repository**: What queries are executed?
-
-## Security & Privacy
-
-- List PII considerations.
-- Detail ownership checks to prevent IDOR.
-
-## Acceptance Criteria
-
-- ...
-
-## Open Questions
-
-- ...
-
-## Testing Plan
-
-- Scenarios for `civicflow-api-test-generator`.
-- ...
-
-## Step 5. Final Output
-
-After saving, respond exactly with:
+After the file is saved, respond to the user with a short summary in this exact format:
 
 Branch: <branch_name>
-Spec file: \_specs/<feature_slug>.md
+Spec file: specs/<feature_slug>.md
 Title: <feature_title>
+
+Do not repeat the full spec in the chat output unless the user explicitly asks to see it. The main goal is to save the spec file and report where it lives and what branch name to use.
