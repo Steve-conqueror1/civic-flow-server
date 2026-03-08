@@ -1,23 +1,15 @@
 import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { pool } from "../../config";
+import { db } from "../../config";
 import { categories } from "./category.schema";
 import type { InferSelectModel } from "drizzle-orm";
-
-const db = drizzle(pool);
 
 export type CategoryRow = InferSelectModel<typeof categories>;
 
 export async function findAllActive(): Promise<CategoryRow[]> {
-  return db
-    .select()
-    .from(categories)
-    .where(eq(categories.isActive, true));
+  return db.select().from(categories).where(eq(categories.isActive, true));
 }
 
-export async function findById(
-  id: string,
-): Promise<CategoryRow | undefined> {
+export async function findById(id: string): Promise<CategoryRow | undefined> {
   const result = await db
     .select()
     .from(categories)
@@ -49,7 +41,12 @@ export async function create(data: {
 
 export async function update(
   id: string,
-  data: Partial<{ name: string; slug: string; description: string; icon: string }>,
+  data: Partial<{
+    name: string;
+    slug: string;
+    description: string;
+    icon: string;
+  }>,
 ): Promise<CategoryRow | undefined> {
   const result = await db
     .update(categories)
