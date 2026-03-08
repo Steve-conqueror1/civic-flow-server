@@ -39,5 +39,9 @@ export const services = pgTable(
   (table) => ({
     categoryIdx: index("services_category_idx").on(table.categoryId),
     departmentIdx: index("services_department_idx").on(table.departmentId),
+    serviceIdx: index("service_department_unique").on(
+      table.name,
+      table.departmentId,
+    ),
   }),
 );

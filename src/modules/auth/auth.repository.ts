@@ -1,11 +1,10 @@
 import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { pool } from "../../config";
+
 import { users } from "../users/users.schema";
 import { userMfa } from "./auth.schema";
 import type { UserRow, SafeUser, CreateUserData } from "../../types";
 
-const db = drizzle(pool);
+import { db } from "../../config";
 
 export async function findUserByEmail(
   email: string,

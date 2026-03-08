@@ -1,0 +1,1 @@
+ALTER TABLE "departments" ADD COLUMN "icon" varchar(255);
