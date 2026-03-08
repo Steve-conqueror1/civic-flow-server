@@ -1,0 +1,1 @@
+CREATE INDEX "service_department_unique" ON "services" USING btree ("name","department_id");

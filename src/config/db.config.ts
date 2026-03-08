@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import dotenv from "dotenv";
+import { drizzle } from "drizzle-orm/node-postgres";
 
 dotenv.config();
 
@@ -18,4 +19,4 @@ pool.on("error", (err) => {
   console.error("Unexpected error on idle client", err.message);
 });
 
-export default pool;
+export const db = drizzle(pool);
