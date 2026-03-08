@@ -13,7 +13,9 @@
     "drizzle:migrate": "npx drizzle-kit migrate",
     "docker:run": "docker compose up -d --build",
     "docker:stop": "docker compose down",
-    "initDB": "tsx src/seed/seed.ts"
+    "initDB": "tsx src/seed/seed.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -43,10 +45,13 @@
     "@types/node": "^25.2.3",
     "@types/nodemailer": "^7.0.11",
     "@types/pg": "^8.16.0",
+    "@types/supertest": "^7.2.0",
     "drizzle-kit": "^0.31.9",
     "nodemon": "^3.1.9",
+    "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^4.0.18"
   }
 }
