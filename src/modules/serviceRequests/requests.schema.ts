@@ -40,6 +40,8 @@ export const serviceRequests = pgTable(
 
     description: text("description").notNull(),
 
+    note: text("note"),
+
     status: requestStatusEnum("status").notNull().default("open"),
 
     location: jsonb("location").$type<{

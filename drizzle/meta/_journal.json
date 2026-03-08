@@ -64,6 +64,13 @@
       "when": 1772967070464,
       "tag": "0008_great_reavers",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1772988379210,
+      "tag": "0009_wealthy_lady_mastermind",
+      "breakpoints": true
     }
   ]
 }
