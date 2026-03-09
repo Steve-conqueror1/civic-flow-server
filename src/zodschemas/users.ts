@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { USER_ROLES, USER_STATUS } from "../utils/constants";
 
 // ---------------------------------------------------------------------------
 // Self-service update (citizen editing own profile)
@@ -22,8 +23,12 @@ export const AdminUpdateUserSchema = z.object({
   phoneNumber: z.string().max(20).optional().nullable(),
   address: z.string().optional().nullable(),
   email: z.string().email().max(255).optional(),
-  role: z.enum(["citizen", "admin", "super_admin"]).optional(),
-  status: z.enum(["active", "inactive", "suspended"]).optional(),
+  role: z
+    .enum([USER_ROLES.CITIZEN, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN])
+    .optional(),
+  status: z
+    .enum([USER_STATUS.ACTIVE, USER_STATUS.INACTIVE, USER_STATUS.SUSPENDED])
+    .optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -33,8 +38,17 @@ export const AdminUpdateUserSchema = z.object({
 export const ListUsersQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
-  role: z.enum(["citizen", "admin", "super_admin"]).optional(),
-  status: z.enum(["active", "inactive", "suspended", "deleted"]).optional(),
+  role: z
+    .enum([USER_ROLES.CITIZEN, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN])
+    .optional(),
+  status: z
+    .enum([
+      USER_STATUS.ACTIVE,
+      USER_STATUS.INACTIVE,
+      USER_STATUS.SUSPENDED,
+      USER_STATUS.DELETED,
+    ])
+    .optional(),
   search: z.string().min(1).optional(),
 });
 
