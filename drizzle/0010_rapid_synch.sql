@@ -1,0 +1,1 @@
+CREATE TYPE "public"."user_status" AS ENUM('active', 'inactive', 'suspended', 'deleted');

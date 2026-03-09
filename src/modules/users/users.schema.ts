@@ -17,6 +17,13 @@ export const userRoleEnum = pgEnum("user_role", [
   "super_admin",
 ]);
 
+export const userStatusEnum = pgEnum("user_status", [
+  "active",
+  "inactive",
+  "suspended",
+  "deleted",
+]);
+
 export const users = pgTable(
   "users",
   {
@@ -32,7 +39,7 @@ export const users = pgTable(
 
     role: userRoleEnum("role").notNull().default("citizen"),
 
-    isActive: boolean("is_active").notNull().default(true),
+    status: userStatusEnum("status").default("active"),
     isEmailVerified: boolean("is_email_verified").notNull().default(false),
     mfaEnabled: boolean("mfa_enabled").notNull().default(false),
 

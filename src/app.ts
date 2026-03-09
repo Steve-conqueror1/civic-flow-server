@@ -11,6 +11,7 @@ import { authRouter } from "./modules/auth";
 import { categoriesRouter } from "./modules/serviceCategories";
 import { servicesRouter } from "./modules/services";
 import { serviceRequestsRouter } from "./modules/serviceRequests";
+import { usersRouter } from "./modules/users";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use("/api/v1", authRouter);
 app.use("/api/v1/categories", categoriesRouter);
 app.use("/api/v1/services", servicesRouter);
 app.use("/api/v1/service-requests", serviceRequestsRouter);
+app.use("/api/v1/users", usersRouter);
 
 app.use(notFoundRouteMiddleware);
 app.use(errorMiddleware);
