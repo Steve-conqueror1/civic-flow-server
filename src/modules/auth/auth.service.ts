@@ -135,7 +135,7 @@ export async function login(
     throw new AppError(401, "Invalid credentials");
   }
 
-  if (!user.isActive) {
+  if (user.status !== "active") {
     throw new AppError(403, "Account is disabled");
   }
 
@@ -207,7 +207,7 @@ export async function refresh(refreshTokenStr: string) {
   }
 
   const user = await authRepo.findUserById(payload.sub);
-  if (!user || !user.isActive) {
+  if (!user || user.status !== "active") {
     throw new AppError(401, "Invalid or expired refresh token");
   }
 

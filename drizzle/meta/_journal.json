@@ -71,6 +71,20 @@
       "when": 1772988379210,
       "tag": "0009_wealthy_lady_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1773077573258,
+      "tag": "0010_rapid_synch",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1773077845988,
+      "tag": "0011_loud_rachel_grey",
+      "breakpoints": true
     }
   ]
 }
