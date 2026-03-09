@@ -5,6 +5,7 @@ import {
   ListUsersQuerySchema,
 } from "../../zodschemas/users";
 import * as usersService from "./users.service";
+import { USER_STATUS } from "../../utils/constants";
 
 /**
  * @route   GET /api/v1/users/me
@@ -189,7 +190,8 @@ export const deactivateUserHandler = async (
       req.params.id as string,
     );
 
-    const action = user.status === "active" ? "reactivated" : "deactivated";
+    const action =
+      user.status === USER_STATUS.ACTIVE ? "reactivated" : "deactivated";
     res.status(200).json({
       success: true,
       message: `User ${action} successfully.`,

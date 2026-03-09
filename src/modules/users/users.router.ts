@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../../middleware/auth.middleware";
 import { requireRole } from "../../middleware/rabc.middleware";
+import { USER_ROLES } from "../../utils/constants";
 import {
   getMeHandler,
   updateMeHandler,
@@ -27,31 +28,31 @@ router.delete("/me", authenticate, deleteMeHandler);
 router.get(
   "/",
   authenticate,
-  requireRole("admin", "super_admin"),
+  requireRole(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   listUsersHandler,
 );
 router.get(
   "/:id",
   authenticate,
-  requireRole("admin", "super_admin"),
+  requireRole(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   getUserByIdHandler,
 );
 router.patch(
   "/:id/deactivate",
   authenticate,
-  requireRole("admin", "super_admin"),
+  requireRole(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   deactivateUserHandler,
 );
 router.patch(
   "/:id",
   authenticate,
-  requireRole("admin", "super_admin"),
+  requireRole(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   adminUpdateUserHandler,
 );
 router.delete(
   "/:id",
   authenticate,
-  requireRole("admin", "super_admin"),
+  requireRole(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   adminDeleteUserHandler,
 );
 

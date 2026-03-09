@@ -15,7 +15,11 @@ import * as authRepo from "./auth.repository";
 
 import type { RegisterBody } from "../../zodschemas/auth";
 import type { CookieOptions } from "express";
-import { LOCKOUT_DURATION_MS, LOCKOUT_THRESHOLD } from "../../utils/constants";
+import {
+  LOCKOUT_DURATION_MS,
+  LOCKOUT_THRESHOLD,
+  USER_STATUS,
+} from "../../utils/constants";
 import {
   buildPasswordResetEmailHtml,
   buildVerificationEmailHtml,
@@ -135,7 +139,7 @@ export async function login(
     throw new AppError(401, "Invalid credentials");
   }
 
-  if (user.status !== "active") {
+  if (user.status !== USER_STATUS.ACTIVE) {
     throw new AppError(403, "Account is disabled");
   }
 
@@ -207,7 +211,7 @@ export async function refresh(refreshTokenStr: string) {
   }
 
   const user = await authRepo.findUserById(payload.sub);
-  if (!user || user.status !== "active") {
+  if (!user || user.status !== USER_STATUS.ACTIVE) {
     throw new AppError(401, "Invalid or expired refresh token");
   }
 

@@ -3,6 +3,7 @@ import type { InferInsertModel } from "drizzle-orm";
 import { db } from "../../config";
 import { users } from "./users.schema";
 import type { SafeUser, UserRow } from "../../types";
+import { USER_STATUS } from "../../utils/constants";
 
 type UserUpdate = Partial<InferInsertModel<typeof users>>;
 
@@ -11,11 +12,7 @@ type UserUpdate = Partial<InferInsertModel<typeof users>>;
 // ---------------------------------------------------------------------------
 
 export async function findById(id: string): Promise<UserRow | undefined> {
-  const result = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, id))
-    .limit(1);
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
   return result[0];
 }
 
@@ -36,7 +33,10 @@ export async function findAll(opts: {
   }
   if (status) {
     conditions.push(
-      eq(users.status, status as "active" | "inactive" | "suspended" | "deleted"),
+      eq(
+        users.status,
+        status as "active" | "inactive" | "suspended" | "deleted",
+      ),
     );
   }
   if (search) {
@@ -88,7 +88,7 @@ export async function updateById(
 export async function softDeleteById(id: string): Promise<void> {
   await db
     .update(users)
-    .set({ status: "deleted" })
+    .set({ status: USER_STATUS.DELETED })
     .where(eq(users.id, id));
 }
 

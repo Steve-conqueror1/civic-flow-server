@@ -9,7 +9,7 @@ import {
 import * as usersRepo from "./users.repository";
 import type { SafeUser, UserRow } from "../../types";
 import type { UpdateMeBody, AdminUpdateUserBody } from "../../zodschemas/users";
-import { USER_ROLES } from "../../utils/constants";
+import { USER_ROLES, USER_STATUS } from "../../utils/constants";
 
 type Pagination = { page: number; limit: number; total: number };
 
@@ -64,7 +64,7 @@ export async function deleteMe(userId: string): Promise<void> {
   if (user.role === USER_ROLES.SUPER_ADMIN) {
     const activeSuperAdmins = await usersRepo.countByRoleAndStatus(
       USER_ROLES.SUPER_ADMIN,
-      "active",
+      USER_STATUS.ACTIVE,
     );
     if (activeSuperAdmins <= 1) {
       throw new AppError(
@@ -163,12 +163,15 @@ export async function deactivateUser(
     throw new AppError(403, "You do not have permission to modify this user");
   }
 
-  if (target.status === "deleted") {
+  if (target.status === USER_STATUS.DELETED) {
     throw new AppError(409, "Cannot change status of a deleted account");
   }
 
   // Toggle: inactive → active, anything else → inactive
-  const newStatus = target.status === "inactive" ? "active" : "inactive";
+  const newStatus =
+    target.status === USER_STATUS.INACTIVE
+      ? USER_STATUS.ACTIVE
+      : USER_STATUS.INACTIVE;
 
   const updated = await usersRepo.updateById(targetId, {
     status: newStatus,
@@ -191,10 +194,10 @@ export async function adminDeleteUser(
     throw new AppError(403, "You do not have permission to delete this user");
   }
 
-  if (target.role === "super_admin") {
+  if (target.role === USER_ROLES.SUPER_ADMIN) {
     const activeSuperAdmins = await usersRepo.countByRoleAndStatus(
-      "super_admin",
-      "active",
+      USER_ROLES.SUPER_ADMIN,
+      USER_STATUS.ACTIVE,
     );
     if (activeSuperAdmins <= 1) {
       throw new AppError(
