@@ -1,4 +1,9 @@
 export {
+  contactMessages,
+  contactMessageStatusEnum,
+} from "./../modules/contact/contact.schema";
+
+export {
   users,
   userRoleEnum,
   userStatusEnum,
