@@ -19,7 +19,7 @@ export async function submitContactMessage(
     verifyResponse = await axios.post<{ success: boolean }>(
       TURNSTILE_VERIFY_URL,
       new URLSearchParams({
-        secret: process.env.TURNSTILE_SECRET!,
+        secret: env.TURNSTILE_SECRET!,
         response: data.turnstileToken,
         ...(ipAddress ? { remoteip: ipAddress } : {}),
       }),
