@@ -13,6 +13,7 @@ import { servicesRouter } from "./modules/services";
 import { serviceRequestsRouter } from "./modules/serviceRequests";
 import { usersRouter } from "./modules/users";
 import { departmentsRouter } from "./modules/departments";
+import { contactRouter } from "./modules/contact";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use("/api/v1/services", servicesRouter);
 app.use("/api/v1/service-requests", serviceRequestsRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/departments", departmentsRouter);
+app.use("/api/v1/contact", contactRouter);
 
 app.use(notFoundRouteMiddleware);
 app.use(errorMiddleware);
