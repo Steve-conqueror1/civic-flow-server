@@ -8,6 +8,7 @@ import type {
   SubmitContactBody,
   UpdateContactStatusBody,
 } from "../../zodschemas/contact";
+import { TURNSTILE_VERIFY_URL } from "../../utils/constants";
 
 export async function submitContactMessage(
   data: SubmitContactBody,
@@ -16,9 +17,9 @@ export async function submitContactMessage(
   let verifyResponse: { data: { success: boolean } };
   try {
     verifyResponse = await axios.post<{ success: boolean }>(
-      env.TURNSTILE_VERIFY_URL,
+      TURNSTILE_VERIFY_URL,
       new URLSearchParams({
-        secret: env.TURNSTILE_SECRET,
+        secret: process.env.TURNSTILE_SECRET!,
         response: data.turnstileToken,
         ...(ipAddress ? { remoteip: ipAddress } : {}),
       }),
