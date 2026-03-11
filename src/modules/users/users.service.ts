@@ -180,6 +180,28 @@ export async function deactivateUser(
   return updated!;
 }
 
+// ---------------------------------------------------------------------------
+// Public queries
+// ---------------------------------------------------------------------------
+
+export async function getActiveCitizenCount(): Promise<number> {
+  const CACHE_KEY = "users:citizen_active_count";
+
+  const cached = await redisClient.get(CACHE_KEY);
+  if (cached !== null) {
+    return parseInt(cached, 10);
+  }
+
+  const count = await usersRepo.countByRoleAndStatus(
+    USER_ROLES.CITIZEN,
+    USER_STATUS.ACTIVE,
+  );
+
+  await redisClient.set(CACHE_KEY, String(count), { EX: 60 });
+
+  return count;
+}
+
 export async function adminDeleteUser(
   requesterId: string,
   requesterRole: UserRow["role"],
