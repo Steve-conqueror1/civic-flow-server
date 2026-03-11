@@ -83,6 +83,24 @@ export const deleteMeHandler = async (
 };
 
 /**
+ * @route   GET /api/v1/users/count
+ * @desc    Get the total number of active citizen users
+ * @access  Public
+ */
+export const getActiveCitizenCountHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const count = await usersService.getActiveCitizenCount();
+    res.status(200).json({ success: true, count });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
  * @route   GET /api/v1/users
  * @desc    List all users (paginated, filterable)
  * @access  Admin, Super Admin

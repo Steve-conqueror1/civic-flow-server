@@ -6,6 +6,7 @@ import {
   getMeHandler,
   updateMeHandler,
   deleteMeHandler,
+  getActiveCitizenCountHandler,
   listUsersHandler,
   getUserByIdHandler,
   adminUpdateUserHandler,
@@ -21,6 +22,11 @@ const router = Router();
 router.get("/me", authenticate, getMeHandler);
 router.patch("/me", authenticate, updateMeHandler);
 router.delete("/me", authenticate, deleteMeHandler);
+
+// ---------------------------------------------------------------------------
+// Public routes — /count MUST come before /:id
+// ---------------------------------------------------------------------------
+router.get("/count", getActiveCitizenCountHandler);
 
 // ---------------------------------------------------------------------------
 // Admin routes
