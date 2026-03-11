@@ -9,6 +9,7 @@ const envSchema = z.object({
     .enum(["development", "production", "test"])
     .default("development"),
   CLIENT_URL: z.string().default("http://localhost:5173"),
+  API_ENDPOINT: z.string().default("http://localhost:5006/api"),
 
   DATABASE_URL: z.string().min(1),
 

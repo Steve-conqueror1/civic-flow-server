@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import { apiReference } from "@scalar/express-api-reference";
+import { openApiSpec } from "./openapi";
 import { errorMiddleware } from "./middleware/error.middleware";
 import { notFoundRouteMiddleware } from "./middleware/notfoundroute.middleware";
 import { healthRoute } from "./modules/health";
@@ -26,7 +28,20 @@ app.use(
   }),
 );
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'"],
+        imgSrc: ["'self'", "data:"],
+        connectSrc: ["'self'", "'https://proxy.scalar.com'"],
+      },
+    },
+  }),
+);
+
 app.use(morgan("common"));
 app.use(express.json());
 app.use(cookieParser());
@@ -39,6 +54,37 @@ app.use("/api/v1/service-requests", serviceRequestsRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/departments", departmentsRouter);
 app.use("/api/v1/contact", contactRouter);
+
+app.get("/openapi.json", (_req, res) => {
+  res.json(openApiSpec);
+});
+
+app.use(
+  "/docs",
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+
+        styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+
+        imgSrc: ["'self'", "data:", "https:"],
+
+        connectSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      },
+    },
+  }),
+);
+
+app.use(
+  "/docs",
+  apiReference({
+    url: "/openapi.json",
+    theme: "default",
+  }),
+);
 
 app.use(notFoundRouteMiddleware);
 app.use(errorMiddleware);
