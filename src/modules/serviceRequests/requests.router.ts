@@ -8,6 +8,7 @@ import {
   createRequestHandler,
   listRequestsHandler,
   getRequestHandler,
+  getFeaturedCaseHandler,
   updateRequestStatusHandler,
   cancelRequestHandler,
 } from "./requests.controller";
@@ -177,6 +178,19 @@ router.post("/", authenticate, createRequestHandler);
  *         description: Not authenticated
  */
 router.get("/", authenticate, listRequestsHandler);
+
+/**
+ * @openapi
+ * /v1/service-requests/featured:
+ *   get:
+ *     tags: [Service Requests]
+ *     summary: Get the AI-selected featured service request
+ *     description: Returns the currently featured case for the civic dashboard. Cached for 2 minutes.
+ *     responses:
+ *       200:
+ *         description: Featured case or null if no cases exist
+ */
+router.get("/featured", getFeaturedCaseHandler);
 
 // ---------------------------------------------------------------------------
 // Parameterised paths
