@@ -1,3 +1,4 @@
+import { Schema } from "./../../../node_modules/type-fest/source/schema.d";
 import { randomUUID } from "crypto";
 import path from "path";
 import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
@@ -14,6 +15,9 @@ import type {
   CitizenRequestQuery,
   AdminRequestQuery,
 } from "../../zodschemas/serviceRequests";
+
+import { generateText } from "ai";
+import { openai } from "../../config/ai";
 
 type Pagination = { page: number; limit: number; total: number };
 
@@ -210,4 +214,44 @@ export async function cancelRequest(
 
   const updated = await requestRepo.cancel(requestId, note);
   return hydrateAttachments(updated!);
+}
+
+export async function getFeaturedCase() {
+  const recentCases = await requestRepo.getRecentCases();
+  if (recentCases.length === 0) {
+    return null;
+  }
+
+  const casesForAI = recentCases.map((c) => ({
+    id: c.id,
+    title: c.title,
+    description: c.description,
+    note: c.note,
+    aiSummary: c.aiSummary,
+    address: c.location?.address,
+  }));
+
+  const { text: selectedId } = await generateText({
+    model: openai("gpt-5-nano"),
+    prompt: `
+      You are selecting ONE featured community service case for a civic dashboard.
+
+    Selection rules:
+    - Prefer cases that represent meaningful civic activity (repairs, safety issues, infrastructure updates).
+    - Prioritize higher priority cases, but also consider diversity of issue types.
+    - Avoid always selecting the same type of issue (e.g., potholes every time).
+    - Consider status progression (resolved, in progress, open).
+    - Choose the most representative case overall.
+
+    Return ONLY the ID of the selected case.
+
+    Cases:
+    ${JSON.stringify(casesForAI)}
+     `,
+  });
+
+  const featuredCase =
+    recentCases.find((c) => c.id === selectedId) || recentCases[0];
+
+  return featuredCase;
 }

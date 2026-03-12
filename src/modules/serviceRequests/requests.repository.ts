@@ -1,4 +1,4 @@
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, desc } from "drizzle-orm";
 import { db } from "../../config";
 import { serviceRequests } from "./requests.schema";
 import { services } from "../services/service.schema";
@@ -200,4 +200,13 @@ export async function serviceExists(id: string): Promise<boolean> {
     .where(eq(services.id, id))
     .limit(1);
   return result.length > 0;
+}
+
+export async function getRecentCases() {
+  const recentRequests = await db
+    .select()
+    .from(serviceRequests)
+    .limit(15)
+    .orderBy(desc(serviceRequests.createdAt));
+  return recentRequests;
 }
