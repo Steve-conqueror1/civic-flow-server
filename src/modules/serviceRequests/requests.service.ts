@@ -18,6 +18,7 @@ import type {
 
 import { generateText } from "ai";
 import { openai } from "../../config/ai";
+import { redisClient } from "../../config/redis";
 
 type Pagination = { page: number; limit: number; total: number };
 
@@ -216,7 +217,15 @@ export async function cancelRequest(
   return hydrateAttachments(updated!);
 }
 
+const FEATURED_CASE_CACHE_KEY = "service_requests:featured_case";
+const FEATURED_CASE_TTL = 120; // seconds — matches 2-minute BullMQ interval
+
 export async function getFeaturedCase() {
+  const cached = await redisClient.get(FEATURED_CASE_CACHE_KEY);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
   const recentCases = await requestRepo.getRecentCases();
   if (recentCases.length === 0) {
     return null;
@@ -234,24 +243,27 @@ export async function getFeaturedCase() {
   const { text: selectedId } = await generateText({
     model: openai("gpt-5-nano"),
     prompt: `
-      You are selecting ONE featured community service case for a civic dashboard.
+    You are selecting ONE community service request request for a civicFlow App showcase.
 
     Selection rules:
-    - Prefer cases that represent meaningful civic activity (repairs, safety issues, infrastructure updates).
-    - Prioritize higher priority cases, but also consider diversity of issue types.
-    - Avoid always selecting the same type of issue (e.g., potholes every time).
-    - Consider status progression (resolved, in progress, open).
-    - Choose the most representative case overall.
+
+    * Choose a RANDOM case from the list provided.
+    * Prefer cases that were created recently when possible.
+    * Do not prioritize impact, urgency, or category — randomness is the primary goal.
+    * Ensure the case has a clear and appropriate public description.
 
     Return ONLY the ID of the selected case.
 
-    Cases:
-    ${JSON.stringify(casesForAI)}
+    Cases:  ${JSON.stringify(casesForAI)}
      `,
   });
 
   const featuredCase =
     recentCases.find((c) => c.id === selectedId) || recentCases[0];
+
+  await redisClient.set(FEATURED_CASE_CACHE_KEY, JSON.stringify(featuredCase), {
+    EX: FEATURED_CASE_TTL,
+  });
 
   return featuredCase;
 }

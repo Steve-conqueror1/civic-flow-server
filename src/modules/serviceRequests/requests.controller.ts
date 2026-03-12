@@ -201,6 +201,29 @@ export const updateRequestStatusHandler = async (
 };
 
 /**
+ * @route   GET /api/v1/service-requests/featured
+ * @desc    Get the AI-selected featured service request
+ * @access  Public
+ */
+export const getFeaturedCaseHandler = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const featuredCase = await requestService.getFeaturedCase();
+
+    res.status(200).json({
+      success: true,
+      message: "Featured case retrieved successfully.",
+      data: featuredCase,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
  * @route   PATCH /api/v1/service-requests/:id/cancel
  * @desc    Cancel a service request (citizen: own only)
  * @access  Authenticated
