@@ -18,7 +18,7 @@ export const startFeaturedCaseWorker = () => {
         );
       }
     },
-    { connection: bullMQConnection },
+    { connection: bullMQConnection, lockDuration: 30000 },
   );
   return worker;
 };

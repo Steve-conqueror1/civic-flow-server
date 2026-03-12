@@ -218,7 +218,7 @@ export async function cancelRequest(
 }
 
 const FEATURED_CASE_CACHE_KEY = "service_requests:featured_case";
-const FEATURED_CASE_TTL = 120; // seconds — matches 2-minute BullMQ interval
+const FEATURED_CASE_TTL = 100;
 
 export async function getFeaturedCase() {
   const cached = await redisClient.get(FEATURED_CASE_CACHE_KEY);
