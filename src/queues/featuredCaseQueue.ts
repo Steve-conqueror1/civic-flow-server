@@ -17,7 +17,8 @@ export const setupRecurringAiSelection = async () => {
       {},
       {
         repeat: {
-          every: 120000,
+          pattern: "0 0 * * *",
+          tz: "America/Edmonton",
         },
         removeOnComplete: true,
         removeOnFail: true,
