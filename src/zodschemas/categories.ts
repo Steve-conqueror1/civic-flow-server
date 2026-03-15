@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const CreateCategorySchema = z.object({
   name: z.string().min(1).max(255),
-  description: z.string().optional(),
+  description: z.string(),
   icon: z.string().max(255).optional(),
 });
 

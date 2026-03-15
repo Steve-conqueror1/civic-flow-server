@@ -30,18 +30,13 @@ export async function findAll(opts: {
       .limit(limit)
       .offset(offset)
       .orderBy(services.name),
-    db
-      .select({ total: count() })
-      .from(services)
-      .where(whereClause),
+    db.select({ total: count() }).from(services).where(whereClause),
   ]);
 
   return { rows, total };
 }
 
-export async function findById(
-  id: string,
-): Promise<ServiceRow | undefined> {
+export async function findById(id: string): Promise<ServiceRow | undefined> {
   const result = await db
     .select()
     .from(services)
@@ -57,7 +52,9 @@ export async function findByName(
   const result = await db
     .select()
     .from(services)
-    .where(and(eq(services.name, name), eq(services.departmentId, departmentId)))
+    .where(
+      and(eq(services.name, name), eq(services.departmentId, departmentId)),
+    )
     .limit(1);
   return result[0];
 }
@@ -99,10 +96,7 @@ export async function search(opts: {
       .limit(limit)
       .offset(offset)
       .orderBy(services.name),
-    db
-      .select({ total: count() })
-      .from(services)
-      .where(whereClause),
+    db.select({ total: count() }).from(services).where(whereClause),
   ]);
 
   return { rows, total };
@@ -133,10 +127,7 @@ export async function findByCategory(opts: {
       .limit(limit)
       .offset(offset)
       .orderBy(services.name),
-    db
-      .select({ total: count() })
-      .from(services)
-      .where(whereClause),
+    db.select({ total: count() }).from(services).where(whereClause),
   ]);
 
   return { rows, total };
@@ -163,10 +154,7 @@ export async function findByDepartment(opts: {
       .limit(limit)
       .offset(offset)
       .orderBy(services.name),
-    db
-      .select({ total: count() })
-      .from(services)
-      .where(whereClause),
+    db.select({ total: count() }).from(services).where(whereClause),
   ]);
 
   return { rows, total };
@@ -198,11 +186,9 @@ export async function departmentExists(id: string): Promise<boolean> {
 // Grouped queries
 // ---------------------------------------------------------------------------
 
-export async function findGroupedByCategory(
-  limitPerGroup: number,
-): Promise<
+export async function findGroupedByCategory(limitPerGroup: number): Promise<
   Array<{
-    category: { id: string; name: string };
+    category: { id: string; name: string; description: string };
     services: ServiceRow[];
   }>
 > {
@@ -211,6 +197,7 @@ export async function findGroupedByCategory(
       service: services,
       categoryId: categories.id,
       categoryName: categories.name,
+      categoryDescription: categories.description,
     })
     .from(categories)
     .leftJoin(
@@ -222,14 +209,21 @@ export async function findGroupedByCategory(
 
   const map = new Map<
     string,
-    { category: { id: string; name: string }; services: ServiceRow[] }
+    {
+      category: { id: string; name: string; description: string };
+      services: ServiceRow[];
+    }
   >();
 
   for (const row of rows) {
     const key = row.categoryId;
     if (!map.has(key)) {
       map.set(key, {
-        category: { id: row.categoryId, name: row.categoryName },
+        category: {
+          id: row.categoryId,
+          name: row.categoryName,
+          description: row.categoryDescription,
+        },
         services: [],
       });
     }
@@ -246,9 +240,7 @@ export async function findGroupedByCategory(
   return Array.from(map.values());
 }
 
-export async function findGroupedByDepartment(
-  limitPerGroup: number,
-): Promise<
+export async function findGroupedByDepartment(limitPerGroup: number): Promise<
   Array<{
     department: { id: string; name: string };
     services: ServiceRow[];
@@ -352,9 +344,7 @@ const ACTIVE_STATUSES = [
   "pending_review",
 ] as const;
 
-export async function hasActiveRequests(
-  serviceId: string,
-): Promise<boolean> {
+export async function hasActiveRequests(serviceId: string): Promise<boolean> {
   const result = await db
     .select({ total: count() })
     .from(serviceRequests)

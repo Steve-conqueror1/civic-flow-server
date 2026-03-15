@@ -232,7 +232,11 @@ describe("Services API", () => {
     it("returns expected grouped structure", async () => {
       mockService.getGroupedByCategory.mockResolvedValue([
         {
-          category: { id: "cat-1", name: "Certificates" },
+          category: {
+            id: "cat-1",
+            name: "Certificates",
+            description: "description",
+          },
           services: [sampleService],
         },
       ]);
@@ -256,9 +260,7 @@ describe("Services API", () => {
         },
       ]);
 
-      const res = await request(app).get(
-        "/api/v1/services/grouped/department",
-      );
+      const res = await request(app).get("/api/v1/services/grouped/department");
 
       expect(res.status).toBe(200);
       expect(res.body.data.groups).toHaveLength(1);

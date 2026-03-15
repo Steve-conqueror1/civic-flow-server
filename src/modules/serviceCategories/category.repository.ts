@@ -32,7 +32,7 @@ export async function findByName(
 export async function create(data: {
   name: string;
   slug: string;
-  description?: string;
+  description: string;
   icon?: string;
 }): Promise<CategoryRow> {
   const result = await db.insert(categories).values(data).returning();

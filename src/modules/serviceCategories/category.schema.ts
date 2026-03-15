@@ -16,7 +16,7 @@ export const categories = pgTable(
     name: varchar("name", { length: 255 }).notNull(),
     slug: varchar("slug", { length: 255 }).notNull().unique(),
 
-    description: text("description"),
+    description: text("description").notNull(),
 
     icon: varchar("icon", { length: 255 }),
 

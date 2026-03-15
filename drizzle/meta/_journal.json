@@ -92,6 +92,13 @@
       "when": 1773162268150,
       "tag": "0012_tired_mad_thinker",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1773575465276,
+      "tag": "0013_rare_rictor",
+      "breakpoints": true
     }
   ]
 }
