@@ -188,7 +188,7 @@ export async function departmentExists(id: string): Promise<boolean> {
 
 export async function findGroupedByCategory(limitPerGroup: number): Promise<
   Array<{
-    category: { id: string; name: string; description: string };
+    category: { id: string; name: string; description: string; slug: string };
     services: ServiceRow[];
   }>
 > {
@@ -198,6 +198,7 @@ export async function findGroupedByCategory(limitPerGroup: number): Promise<
       categoryId: categories.id,
       categoryName: categories.name,
       categoryDescription: categories.description,
+      categorySlug: categories.slug,
     })
     .from(categories)
     .leftJoin(
@@ -210,7 +211,7 @@ export async function findGroupedByCategory(limitPerGroup: number): Promise<
   const map = new Map<
     string,
     {
-      category: { id: string; name: string; description: string };
+      category: { id: string; name: string; description: string; slug: string };
       services: ServiceRow[];
     }
   >();
@@ -223,6 +224,7 @@ export async function findGroupedByCategory(limitPerGroup: number): Promise<
           id: row.categoryId,
           name: row.categoryName,
           description: row.categoryDescription,
+          slug: row.categorySlug,
         },
         services: [],
       });

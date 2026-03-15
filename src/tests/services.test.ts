@@ -236,6 +236,7 @@ describe("Services API", () => {
             id: "cat-1",
             name: "Certificates",
             description: "description",
+            slug: "certificates",
           },
           services: [sampleService],
         },
