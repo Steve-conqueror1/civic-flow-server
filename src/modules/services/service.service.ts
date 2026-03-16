@@ -1,6 +1,6 @@
 import { AppError } from "../../shared/errors/AppError";
 import * as serviceRepo from "./service.repository";
-import type { ServiceRow } from "./service.repository";
+import type { ServiceRow, ServiceWithRelations } from "./service.repository";
 import type { CreateServiceBody, UpdateServiceBody } from "../../zodschemas/services";
 
 type Pagination = { page: number; limit: number; total: number };
@@ -52,6 +52,14 @@ export async function getServiceById(id: string): Promise<ServiceRow> {
   if (!service) {
     throw new AppError(404, "Service not found.");
   }
+  return service;
+}
+
+export async function getServiceBySlug(
+  slug: string,
+): Promise<ServiceWithRelations> {
+  const service = await serviceRepo.findBySlugWithRelations(slug);
+  if (!service) throw new AppError(404, "Service not found.");
   return service;
 }
 

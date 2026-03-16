@@ -239,7 +239,7 @@ export const listByDepartmentHandler = async (
 };
 
 /**
- * @route   GET /api/v1/services/:id
+ * @route   GET /api/v1/services/id/:id
  * @desc    Get a single service by ID
  * @access  Public
  */
@@ -251,6 +251,30 @@ export const getServiceHandler = async (
   try {
     const service = await serviceService.getServiceById(
       req.params.id as string,
+    );
+    res.status(200).json({
+      success: true,
+      message: "Service retrieved successfully.",
+      data: { service },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * @route   GET /api/v1/services/:slug
+ * @desc    Get a single service by slug
+ * @access  Public
+ */
+export const getServiceBySlugHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const service = await serviceService.getServiceBySlug(
+      req.params.slug as string,
     );
     res.status(200).json({
       success: true,

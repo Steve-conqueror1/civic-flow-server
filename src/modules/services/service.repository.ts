@@ -70,6 +70,41 @@ export async function findBySlug(
   return result[0];
 }
 
+export type ServiceWithRelations = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  instructions: string | null;
+  departmentId: string;
+  departmentName: string;
+  categoryId: string;
+  categoryName: string;
+};
+
+export async function findBySlugWithRelations(
+  slug: string,
+): Promise<ServiceWithRelations | undefined> {
+  const result = await db
+    .select({
+      id: services.id,
+      name: services.name,
+      slug: services.slug,
+      description: services.description,
+      instructions: services.instructions,
+      departmentId: departments.id,
+      departmentName: departments.name,
+      categoryId: categories.id,
+      categoryName: categories.name,
+    })
+    .from(services)
+    .innerJoin(departments, eq(services.departmentId, departments.id))
+    .innerJoin(categories, eq(services.categoryId, categories.id))
+    .where(eq(services.slug, slug.toLowerCase()))
+    .limit(1);
+  return result[0];
+}
+
 // ---------------------------------------------------------------------------
 // Search
 // ---------------------------------------------------------------------------

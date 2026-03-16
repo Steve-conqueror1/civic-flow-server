@@ -12,6 +12,7 @@ import {
   listByCategoryHandler,
   listByDepartmentHandler,
   getServiceHandler,
+  getServiceBySlugHandler,
   createServiceHandler,
   updateServiceHandler,
   deleteServiceHandler,
@@ -188,7 +189,7 @@ router.get("/department/:departmentId", listByDepartmentHandler);
 
 /**
  * @openapi
- * /v1/services/{id}:
+ * /v1/services/id/{id}:
  *   get:
  *     tags: [Services]
  *     summary: Get a service by ID
@@ -205,7 +206,27 @@ router.get("/department/:departmentId", listByDepartmentHandler);
  *       404:
  *         description: Service not found
  */
-router.get("/:id", getServiceHandler);
+router.get("/id/:id", getServiceHandler);
+
+/**
+ * @openapi
+ * /v1/services/{slug}:
+ *   get:
+ *     tags: [Services]
+ *     summary: Get a service by slug
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Service details with department and category names
+ *       404:
+ *         description: Service not found
+ */
+router.get("/:slug", getServiceBySlugHandler);
 
 // ---------------------------------------------------------------------------
 // Admin routes
