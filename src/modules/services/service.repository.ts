@@ -90,12 +90,16 @@ export async function findBySlugWithRelations(
       id: services.id,
       name: services.name,
       slug: services.slug,
+      minResponseDays: services.minResponseDays,
+      maxResponseDays: services.maxResponseDays,
       description: services.description,
       instructions: services.instructions,
       departmentId: departments.id,
       departmentName: departments.name,
+      departmentSlug: departments.slug,
       categoryId: categories.id,
       categoryName: categories.name,
+      categorySlug: categories.slug,
     })
     .from(services)
     .innerJoin(departments, eq(services.departmentId, departments.id))
