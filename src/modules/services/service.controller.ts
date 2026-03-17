@@ -5,6 +5,7 @@ import {
   ServiceQuerySchema,
   ServiceSearchQuerySchema,
   GroupedQuerySchema,
+  PopularServicesQuerySchema,
 } from "../../zodschemas/services";
 import * as serviceService from "./service.service";
 
@@ -158,6 +159,39 @@ export const getGroupedByDepartmentHandler = async (
           total: g.services.length,
         })),
       },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * @route   GET /api/v1/services/popular
+ * @desc    Return the most popular services ranked by request count
+ * @access  Public
+ */
+export const getPopularServicesHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const parsed = PopularServicesQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: parsed.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    const services = await serviceService.getPopularServices(parsed.data.limit);
+
+    res.status(200).json({
+      success: true,
+      message: "Popular services retrieved successfully.",
+      data: { services },
     });
   } catch (err) {
     next(err);

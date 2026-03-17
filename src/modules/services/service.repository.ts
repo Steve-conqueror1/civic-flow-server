@@ -1,4 +1,4 @@
-import { eq, and, or, ilike, inArray, count, sql } from "drizzle-orm";
+import { eq, and, or, ilike, inArray, count, sql, desc, asc } from "drizzle-orm";
 import { db } from "../../config";
 import { services } from "./service.schema";
 import { serviceRequests } from "../serviceRequests/requests.schema";
@@ -328,6 +328,28 @@ export async function findGroupedByDepartment(limitPerGroup: number): Promise<
   }
 
   return Array.from(map.values());
+}
+
+// ---------------------------------------------------------------------------
+// Popular services
+// ---------------------------------------------------------------------------
+
+export async function findPopular(limit: number): Promise<ServiceRow[]> {
+  const requestCount = count(serviceRequests.id);
+
+  const rows = await db
+    .select({
+      service: services,
+      requestCount,
+    })
+    .from(services)
+    .leftJoin(serviceRequests, eq(serviceRequests.serviceId, services.id))
+    .where(eq(services.isActive, true))
+    .groupBy(services.id)
+    .orderBy(desc(requestCount), asc(services.name))
+    .limit(limit);
+
+  return rows.map((r) => r.service);
 }
 
 // ---------------------------------------------------------------------------

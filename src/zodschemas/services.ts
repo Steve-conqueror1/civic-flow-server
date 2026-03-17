@@ -56,6 +56,10 @@ export const GroupedQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(10),
 });
 
+export const PopularServicesQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).default(4),
+});
+
 // ---------------------------------------------------------------------------
 // Inferred types
 // ---------------------------------------------------------------------------
@@ -65,3 +69,4 @@ export type UpdateServiceBody = Partial<CreateServiceBody>;
 export type ServiceQuery = z.infer<typeof ServiceQuerySchema>;
 export type ServiceSearchQuery = z.infer<typeof ServiceSearchQuerySchema>;
 export type GroupedQuery = z.infer<typeof GroupedQuerySchema>;
+export type PopularServicesQuery = z.infer<typeof PopularServicesQuerySchema>;
