@@ -12,6 +12,7 @@ import {
   listByCategoryHandler,
   listByDepartmentHandler,
   getServiceHandler,
+  getPopularServicesHandler,
   getServiceBySlugHandler,
   createServiceHandler,
   updateServiceHandler,
@@ -207,6 +208,28 @@ router.get("/department/:departmentId", listByDepartmentHandler);
  *         description: Service not found
  */
 router.get("/id/:id", getServiceHandler);
+
+/**
+ * @openapi
+ * /v1/services/popular:
+ *   get:
+ *     tags: [Services]
+ *     summary: Get popular services ranked by request count
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 4
+ *           minimum: 1
+ *         description: Number of popular services to return
+ *     responses:
+ *       200:
+ *         description: Popular services sorted by request count descending
+ *       400:
+ *         description: Invalid limit parameter
+ */
+router.get("/popular", getPopularServicesHandler);
 
 /**
  * @openapi

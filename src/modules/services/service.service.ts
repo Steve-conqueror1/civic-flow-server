@@ -117,6 +117,12 @@ export async function getGroupedByDepartment(limitPerGroup: number) {
   return serviceRepo.findGroupedByDepartment(limitPerGroup);
 }
 
+export async function getPopularServices(
+  limit: number,
+): Promise<ServiceRow[]> {
+  return serviceRepo.findPopular(limit);
+}
+
 // ---------------------------------------------------------------------------
 // Admin mutations
 // ---------------------------------------------------------------------------
