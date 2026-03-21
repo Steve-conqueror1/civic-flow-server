@@ -12,6 +12,7 @@ const envSchema = z.object({
   API_ENDPOINT: z.string().default("http://localhost:5006/api"),
 
   DATABASE_URL: z.string().min(1),
+  APP_DOMAIN: z.string().min(1),
 
   REDIS_URL: z.string().default("redis://localhost:6379"),
 

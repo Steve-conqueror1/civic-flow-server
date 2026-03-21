@@ -66,8 +66,8 @@ export function buildCookieOptions(type: "access" | "refresh"): CookieOptions {
   return {
     httpOnly: true,
     secure: isProduction,
-    sameSite: "none",
-    domain: ".skilonzo.com",
+    sameSite: isProduction ? "none" : "lax",
+    domain: isProduction ? env.APP_DOMAIN : undefined,
     maxAge: type === "access" ? 15 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000,
   };
 }
