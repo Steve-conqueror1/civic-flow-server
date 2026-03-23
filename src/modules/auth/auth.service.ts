@@ -370,5 +370,5 @@ export async function getCurrentUser(userId: string): Promise<SafeUser> {
   if (!user) {
     throw new AppError(404, "User not found");
   }
-  return user;
+  return stripPasswordHash(user);
 }
