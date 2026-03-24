@@ -53,9 +53,18 @@ export const ListUsersQuerySchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Set user status (activate / deactivate / suspend / delete)
+// ---------------------------------------------------------------------------
+
+export const SetUserStatusSchema = z.object({
+  reason: z.string().max(500).optional(),
+});
+
+// ---------------------------------------------------------------------------
 // Inferred types
 // ---------------------------------------------------------------------------
 
 export type UpdateMeBody = z.infer<typeof UpdateMeSchema>;
 export type AdminUpdateUserBody = z.infer<typeof AdminUpdateUserSchema>;
 export type ListUsersQuery = z.infer<typeof ListUsersQuerySchema>;
+export type SetUserStatusBody = z.infer<typeof SetUserStatusSchema>;

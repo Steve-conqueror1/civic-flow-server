@@ -9,6 +9,7 @@ import {
   pgEnum,
   integer,
   index,
+  foreignKey,
 } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum("user_role", [
@@ -111,5 +112,34 @@ export const users = pgTable(
     emailIdx: index("users_email_idx").on(table.email),
     roleIdx: index("users_role_idx").on(table.role),
     departmentIdx: index("users_department_idx").on(table.departmentId),
+  }),
+);
+
+export const userStatusAudit = pgTable(
+  "user_status_audit",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull(),
+    changedBy: uuid("changed_by").notNull(),
+    oldStatus: userStatusEnum("old_status").notNull(),
+    newStatus: userStatusEnum("new_status").notNull(),
+    reason: text("reason"),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    userFk: foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: "user_status_audit_user_fk",
+    }),
+    changedByFk: foreignKey({
+      columns: [table.changedBy],
+      foreignColumns: [users.id],
+      name: "user_status_audit_changed_by_fk",
+    }),
   }),
 );

@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env";
+import { redisClient } from "../config/redis";
 import type { JwtAccessPayload } from "../types";
 
-export const authenticate = (
+export const authenticate = async (
   req: Request,
   res: Response,
   next: NextFunction,
-): void => {
+): Promise<void> => {
   const token = req.cookies["access_token"] as string | undefined;
 
   if (!token) {
@@ -19,6 +20,19 @@ export const authenticate = (
 
   try {
     const payload = jwt.verify(token, env.JWT_SECRET) as JwtAccessPayload;
+
+    // Check if user sessions were revoked (e.g. due to suspension)
+    const revokedAt = await redisClient.get(
+      `user_sessions_revoked:${payload.sub}`,
+    );
+    if (revokedAt && payload.iat && payload.iat < Number(revokedAt)) {
+      res.status(401).json({
+        success: false,
+        message: "Session has been revoked.",
+      });
+      return;
+    }
+
     req.user = payload;
     next();
   } catch (err) {
