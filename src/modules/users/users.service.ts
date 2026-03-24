@@ -4,6 +4,8 @@ import { redisClient } from "../../config/redis";
 import { sendEmail } from "../../utils/email";
 import {
   buildVerificationEmailHtml,
+  buildSuspensionEmailHtml,
+  buildDeactivationEmailHtml,
   stripPasswordHash,
 } from "../../utils/helpers";
 import * as usersRepo from "./users.repository";
@@ -158,35 +160,104 @@ export async function adminUpdateUser(
   return updated!;
 }
 
-export async function deactivateUser(
+// ---------------------------------------------------------------------------
+// Unified status management
+// ---------------------------------------------------------------------------
+
+export async function setUserStatus(
   requesterId: string,
   requesterRole: UserRow["role"],
   targetId: string,
+  newStatus: NonNullable<UserRow["status"]>,
+  opts?: { reason?: string; ipAddress?: string; userAgent?: string },
 ): Promise<SafeUser> {
   const target = await usersRepo.findById(targetId);
   if (!target) {
     throw new AppError(404, "User not found");
   }
 
+  if (requesterId === targetId) {
+    throw new AppError(403, "You cannot change your own status");
+  }
+
   if (!canModifyTarget(requesterRole, target.role)) {
     throw new AppError(403, "You do not have permission to modify this user");
   }
 
-  if (target.status === USER_STATUS.DELETED) {
-    throw new AppError(409, "Cannot change status of a deleted account");
+  if (target.status === newStatus) {
+    throw new AppError(409, `User is already ${newStatus}`);
   }
 
-  // Toggle: inactive → active, anything else → inactive
-  const newStatus =
-    target.status === USER_STATUS.INACTIVE
-      ? USER_STATUS.ACTIVE
-      : USER_STATUS.INACTIVE;
+  if (target.status === USER_STATUS.DELETED) {
+    throw new AppError(403, "Cannot change status of a deleted account");
+  }
+
+  // Last super-admin guard for non-active statuses
+  if (
+    newStatus !== USER_STATUS.ACTIVE &&
+    target.role === USER_ROLES.SUPER_ADMIN
+  ) {
+    const activeSuperAdmins = await usersRepo.countByRoleAndStatus(
+      USER_ROLES.SUPER_ADMIN,
+      USER_STATUS.ACTIVE,
+    );
+    if (activeSuperAdmins <= 1) {
+      throw new AppError(
+        403,
+        "Cannot change status of the last active super admin account",
+      );
+    }
+  }
 
   const updated = await usersRepo.updateById(targetId, {
     status: newStatus,
     updatedBy: requesterId,
   });
+
+  // Write audit record
+  await usersRepo.insertStatusAuditRecord({
+    userId: targetId,
+    changedBy: requesterId,
+    oldStatus: target.status!,
+    newStatus,
+    reason: opts?.reason,
+    ipAddress: opts?.ipAddress,
+    userAgent: opts?.userAgent,
+  });
+
+  // Revoke all active sessions on suspension
+  if (newStatus === USER_STATUS.SUSPENDED) {
+    await redisClient.set(
+      `user_sessions_revoked:${targetId}`,
+      String(Math.floor(Date.now() / 1000)),
+    );
+  }
+
+  // Email notifications
+  if (newStatus === USER_STATUS.SUSPENDED) {
+    await sendEmail(
+      target.email,
+      "Your CivicFlow account has been suspended",
+      buildSuspensionEmailHtml(target.firstName),
+    );
+  } else if (newStatus === USER_STATUS.INACTIVE) {
+    await sendEmail(
+      target.email,
+      "Your CivicFlow account has been deactivated",
+      buildDeactivationEmailHtml(target.firstName),
+    );
+  }
+
   return updated!;
+}
+
+export async function deactivateUser(
+  requesterId: string,
+  requesterRole: UserRow["role"],
+  targetId: string,
+  opts?: { reason?: string; ipAddress?: string; userAgent?: string },
+): Promise<SafeUser> {
+  return setUserStatus(requesterId, requesterRole, targetId, USER_STATUS.INACTIVE, opts);
 }
 
 // ---------------------------------------------------------------------------
@@ -215,28 +286,7 @@ export async function adminDeleteUser(
   requesterId: string,
   requesterRole: UserRow["role"],
   targetId: string,
-): Promise<void> {
-  const target = await usersRepo.findById(targetId);
-  if (!target) {
-    throw new AppError(404, "User not found");
-  }
-
-  if (!canModifyTarget(requesterRole, target.role)) {
-    throw new AppError(403, "You do not have permission to delete this user");
-  }
-
-  if (target.role === USER_ROLES.SUPER_ADMIN) {
-    const activeSuperAdmins = await usersRepo.countByRoleAndStatus(
-      USER_ROLES.SUPER_ADMIN,
-      USER_STATUS.ACTIVE,
-    );
-    if (activeSuperAdmins <= 1) {
-      throw new AppError(
-        403,
-        "Cannot delete the last active super admin account",
-      );
-    }
-  }
-
-  await usersRepo.softDeleteById(targetId);
+  opts?: { reason?: string; ipAddress?: string; userAgent?: string },
+): Promise<SafeUser> {
+  return setUserStatus(requesterId, requesterRole, targetId, USER_STATUS.DELETED, opts);
 }

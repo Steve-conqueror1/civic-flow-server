@@ -23,3 +23,21 @@ export function buildPasswordResetEmailHtml(token: string): string {
     <a href="${url}">${url}</a>
   `;
 }
+
+export function buildSuspensionEmailHtml(firstName: string): string {
+  return `
+    <h2>Your CivicFlow account has been suspended</h2>
+    <p>Hi ${firstName},</p>
+    <p>Your account has been suspended by an administrator. You will not be able to access the platform until your account is reactivated.</p>
+    <p>If you believe this is a mistake, please contact support.</p>
+  `;
+}
+
+export function buildDeactivationEmailHtml(firstName: string): string {
+  return `
+    <h2>Your CivicFlow account has been deactivated</h2>
+    <p>Hi ${firstName},</p>
+    <p>Your account has been deactivated by an administrator. You will not be able to access the platform until your account is reactivated.</p>
+    <p>If you believe this is a mistake, please contact support.</p>
+  `;
+}

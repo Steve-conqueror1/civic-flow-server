@@ -11,7 +11,10 @@ import {
   listUsersHandler,
   getUserByIdHandler,
   adminUpdateUserHandler,
+  activateUserHandler,
   deactivateUserHandler,
+  suspendUserHandler,
+  deleteUserStatusHandler,
   adminDeleteUserHandler,
 } from "./users.controller";
 
@@ -258,10 +261,10 @@ router.get(
 
 /**
  * @openapi
- * /v1/users/{id}/deactivate:
+ * /v1/users/{id}/activate:
  *   patch:
  *     tags: [Users]
- *     summary: Toggle user active/inactive status
+ *     summary: Set user status to active
  *     security:
  *       - cookieAuth: []
  *     parameters:
@@ -271,21 +274,161 @@ router.get(
  *         schema:
  *           type: string
  *           format: uuid
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *                 maxLength: 500
  *     responses:
  *       200:
- *         description: User status toggled
+ *         description: User activated
  *       401:
  *         description: Not authenticated
  *       403:
  *         description: Insufficient permissions
  *       404:
  *         description: User not found
+ *       409:
+ *         description: User is already active
+ */
+router.patch(
+  "/:id/activate",
+  authenticate,
+  requireRole(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  activateUserHandler,
+);
+
+/**
+ * @openapi
+ * /v1/users/{id}/deactivate:
+ *   patch:
+ *     tags: [Users]
+ *     summary: Set user status to inactive
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *                 maxLength: 500
+ *     responses:
+ *       200:
+ *         description: User deactivated
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Insufficient permissions
+ *       404:
+ *         description: User not found
+ *       409:
+ *         description: User is already inactive
  */
 router.patch(
   "/:id/deactivate",
   authenticate,
   requireRole(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   deactivateUserHandler,
+);
+
+/**
+ * @openapi
+ * /v1/users/{id}/suspend:
+ *   patch:
+ *     tags: [Users]
+ *     summary: Set user status to suspended
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *                 maxLength: 500
+ *     responses:
+ *       200:
+ *         description: User suspended
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Insufficient permissions
+ *       404:
+ *         description: User not found
+ *       409:
+ *         description: User is already suspended
+ */
+router.patch(
+  "/:id/suspend",
+  authenticate,
+  requireRole(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  suspendUserHandler,
+);
+
+/**
+ * @openapi
+ * /v1/users/{id}/delete:
+ *   patch:
+ *     tags: [Users]
+ *     summary: Soft-delete a user account (set status to deleted)
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *                 maxLength: 500
+ *     responses:
+ *       200:
+ *         description: User deleted
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Insufficient permissions
+ *       404:
+ *         description: User not found
+ *       409:
+ *         description: User is already deleted
+ */
+router.patch(
+  "/:id/delete",
+  authenticate,
+  requireRole(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  deleteUserStatusHandler,
 );
 
 /**

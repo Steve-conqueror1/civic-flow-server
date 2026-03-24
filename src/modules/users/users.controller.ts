@@ -3,9 +3,9 @@ import {
   UpdateMeSchema,
   AdminUpdateUserSchema,
   ListUsersQuerySchema,
+  SetUserStatusSchema,
 } from "../../zodschemas/users";
 import * as usersService from "./users.service";
-import { USER_STATUS } from "../../utils/constants";
 
 /**
  * @route   GET /api/v1/users/me
@@ -214,8 +214,50 @@ export const adminUpdateUserHandler = async (
 };
 
 /**
+ * @route   PATCH /api/v1/users/:id/activate
+ * @desc    Set user status to active
+ * @access  Admin, Super Admin
+ */
+export const activateUserHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const parsed = SetUserStatusSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: parsed.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    const user = await usersService.setUserStatus(
+      req.user!.sub,
+      req.user!.role,
+      req.params.id as string,
+      "active",
+      {
+        reason: parsed.data.reason,
+        ipAddress: req.ip,
+        userAgent: req.headers["user-agent"],
+      },
+    );
+    res.status(200).json({
+      success: true,
+      message: "User activated successfully.",
+      data: { user },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
  * @route   PATCH /api/v1/users/:id/deactivate
- * @desc    Toggle user active/inactive status
+ * @desc    Set user status to inactive
  * @access  Admin, Super Admin
  */
 export const deactivateUserHandler = async (
@@ -224,17 +266,112 @@ export const deactivateUserHandler = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
+    const parsed = SetUserStatusSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: parsed.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
     const user = await usersService.deactivateUser(
       req.user!.sub,
       req.user!.role,
       req.params.id as string,
+      {
+        reason: parsed.data.reason,
+        ipAddress: req.ip,
+        userAgent: req.headers["user-agent"],
+      },
     );
-
-    const action =
-      user.status === USER_STATUS.ACTIVE ? "reactivated" : "deactivated";
     res.status(200).json({
       success: true,
-      message: `User ${action} successfully.`,
+      message: "User deactivated successfully.",
+      data: { user },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * @route   PATCH /api/v1/users/:id/suspend
+ * @desc    Set user status to suspended
+ * @access  Admin, Super Admin
+ */
+export const suspendUserHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const parsed = SetUserStatusSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: parsed.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    const user = await usersService.setUserStatus(
+      req.user!.sub,
+      req.user!.role,
+      req.params.id as string,
+      "suspended",
+      {
+        reason: parsed.data.reason,
+        ipAddress: req.ip,
+        userAgent: req.headers["user-agent"],
+      },
+    );
+    res.status(200).json({
+      success: true,
+      message: "User suspended successfully.",
+      data: { user },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * @route   PATCH /api/v1/users/:id/delete
+ * @desc    Soft-delete a user account (set status to deleted)
+ * @access  Admin, Super Admin
+ */
+export const deleteUserStatusHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const parsed = SetUserStatusSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: parsed.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    const user = await usersService.adminDeleteUser(
+      req.user!.sub,
+      req.user!.role,
+      req.params.id as string,
+      {
+        reason: parsed.data.reason,
+        ipAddress: req.ip,
+        userAgent: req.headers["user-agent"],
+      },
+    );
+    res.status(200).json({
+      success: true,
+      message: "User deleted successfully.",
       data: { user },
     });
   } catch (err) {
@@ -244,7 +381,7 @@ export const deactivateUserHandler = async (
 
 /**
  * @route   DELETE /api/v1/users/:id
- * @desc    Soft-delete a user account
+ * @desc    Soft-delete a user account (backward compat)
  * @access  Admin, Super Admin
  */
 export const adminDeleteUserHandler = async (
@@ -253,7 +390,7 @@ export const adminDeleteUserHandler = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    await usersService.adminDeleteUser(
+    const user = await usersService.adminDeleteUser(
       req.user!.sub,
       req.user!.role,
       req.params.id as string,
@@ -261,6 +398,7 @@ export const adminDeleteUserHandler = async (
     res.status(200).json({
       success: true,
       message: "User deleted successfully.",
+      data: { user },
     });
   } catch (err) {
     next(err);

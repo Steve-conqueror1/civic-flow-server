@@ -1,7 +1,7 @@
 import { eq, and, or, ilike, count, sql } from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import { db } from "../../config";
-import { users } from "./users.schema";
+import { users, userStatusAudit } from "./users.schema";
 import type { SafeUser, UserRow } from "../../types";
 import { USER_STATUS } from "../../utils/constants";
 
@@ -138,4 +138,28 @@ export async function countByRoleAndStatus(
     .from(users)
     .where(and(eq(users.role, role), eq(users.status, status)));
   return Number(result[0].total);
+}
+
+// ---------------------------------------------------------------------------
+// Audit
+// ---------------------------------------------------------------------------
+
+export async function insertStatusAuditRecord(data: {
+  userId: string;
+  changedBy: string;
+  oldStatus: string;
+  newStatus: string;
+  reason?: string;
+  ipAddress?: string;
+  userAgent?: string;
+}): Promise<void> {
+  await db.insert(userStatusAudit).values({
+    userId: data.userId,
+    changedBy: data.changedBy,
+    oldStatus: data.oldStatus as "active" | "inactive" | "suspended" | "deleted",
+    newStatus: data.newStatus as "active" | "inactive" | "suspended" | "deleted",
+    reason: data.reason ?? null,
+    ipAddress: data.ipAddress ?? null,
+    userAgent: data.userAgent ?? null,
+  });
 }
