@@ -101,6 +101,28 @@ export const getActiveCitizenCountHandler = async (
 };
 
 /**
+ * @route   GET /api/v1/users/stats
+ * @desc    Get user statistics (total, staff, inactive, suspended)
+ * @access  Admin, Super Admin
+ */
+export const getUserStatsHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const stats = await usersService.getUserStats();
+    res.status(200).json({
+      success: true,
+      message: "User statistics retrieved successfully.",
+      data: stats,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
  * @route   GET /api/v1/users
  * @desc    List all users (paginated, filterable)
  * @access  Admin, Super Admin

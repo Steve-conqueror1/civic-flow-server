@@ -7,6 +7,7 @@ import {
   updateMeHandler,
   deleteMeHandler,
   getActiveCitizenCountHandler,
+  getUserStatsHandler,
   listUsersHandler,
   getUserByIdHandler,
   adminUpdateUserHandler,
@@ -128,6 +129,50 @@ router.get("/count", getActiveCitizenCountHandler);
 // ---------------------------------------------------------------------------
 // Admin routes
 // ---------------------------------------------------------------------------
+
+/**
+ * @openapi
+ * /v1/users/stats:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get user statistics (total, staff, inactive, suspended)
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: User statistics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     totalUsers:
+ *                       type: integer
+ *                     totalStaff:
+ *                       type: integer
+ *                     inactiveUsers:
+ *                       type: integer
+ *                     suspendedUsers:
+ *                       type: integer
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Admin or Super Admin role required
+ */
+router.get(
+  "/stats",
+  authenticate,
+  requireRole(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  getUserStatsHandler,
+);
 
 /**
  * @openapi

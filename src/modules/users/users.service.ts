@@ -78,6 +78,15 @@ export async function deleteMe(userId: string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Admin stats
+// ---------------------------------------------------------------------------
+
+export async function getUserStats() {
+  const staffRoles: UserRow["role"][] = [USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN];
+  return usersRepo.getUserStats(staffRoles);
+}
+
+// ---------------------------------------------------------------------------
 // Admin queries
 // ---------------------------------------------------------------------------
 
