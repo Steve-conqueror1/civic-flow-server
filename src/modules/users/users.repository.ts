@@ -1,9 +1,16 @@
-import { eq, and, or, ilike, count } from "drizzle-orm";
+import { eq, and, or, ilike, count, sql } from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import { db } from "../../config";
 import { users } from "./users.schema";
 import type { SafeUser, UserRow } from "../../types";
 import { USER_STATUS } from "../../utils/constants";
+
+export type UserStats = {
+  totalUsers: number;
+  totalStaff: number;
+  inactiveUsers: number;
+  suspendedUsers: number;
+};
 
 type UserUpdate = Partial<InferInsertModel<typeof users>>;
 
@@ -95,6 +102,32 @@ export async function softDeleteById(id: string): Promise<void> {
 // ---------------------------------------------------------------------------
 // Guards
 // ---------------------------------------------------------------------------
+
+export async function getUserStats(
+  staffRoles: UserRow["role"][],
+): Promise<UserStats> {
+  const roleList = staffRoles.map((r) => `'${r}'`).join(", ");
+
+  const result = await db
+    .select({
+      totalUsers: count(),
+      totalStaff:
+        sql<number>`(count(*) filter (where ${users.role} in (${sql.raw(roleList)})))::int`,
+      inactiveUsers:
+        sql<number>`(count(*) filter (where ${users.isEmailVerified} = false))::int`,
+      suspendedUsers:
+        sql<number>`(count(*) filter (where ${users.status} = 'suspended'))::int`,
+    })
+    .from(users);
+
+  const row = result[0];
+  return {
+    totalUsers: Number(row.totalUsers),
+    totalStaff: row.totalStaff,
+    inactiveUsers: row.inactiveUsers,
+    suspendedUsers: row.suspendedUsers,
+  };
+}
 
 export async function countByRoleAndStatus(
   role: UserRow["role"],
