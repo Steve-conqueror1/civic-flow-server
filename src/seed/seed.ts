@@ -10,6 +10,7 @@ import {
   users,
   serviceRequests,
   requestStatusEnum,
+  userStatusAudit,
 } from "../db";
 
 import { departmentsData } from "./departmentsData";
@@ -26,6 +27,7 @@ async function initDB() {
     console.log("starting database data initialization");
 
     await db.transaction(async (tx) => {
+      await tx.delete(userStatusAudit);
       await tx.delete(serviceRequests);
       await tx.delete(services);
       await tx.delete(categories);

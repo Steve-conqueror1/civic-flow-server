@@ -16,6 +16,7 @@ import { serviceRequestsRouter } from "./modules/serviceRequests";
 import { usersRouter } from "./modules/users";
 import { departmentsRouter } from "./modules/departments";
 import { contactRouter } from "./modules/contact";
+import { aiRouter } from "./modules/ai";
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use("/api/v1/service-requests", serviceRequestsRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/departments", departmentsRouter);
 app.use("/api/v1/contact", contactRouter);
+app.use("/api/v1/ai", aiRouter);
 
 app.get("/openapi.json", (_req, res) => {
   res.json(openApiSpec);

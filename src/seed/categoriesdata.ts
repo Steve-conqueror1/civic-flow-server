@@ -31,4 +31,11 @@ export const categoriesData = [
       "Business permits, construction approvals, and municipal licensing.",
     icon: "file-check",
   },
+  {
+    name: "Other",
+    slug: "other",
+    description:
+      "General issues or services that do not fall under a specific category.",
+    icon: "more-horizontal",
+  },
 ];
