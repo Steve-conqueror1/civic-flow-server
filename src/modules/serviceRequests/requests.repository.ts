@@ -1,4 +1,4 @@
-import { eq, and, count, desc } from "drizzle-orm";
+import { eq, and, count, desc, inArray } from "drizzle-orm";
 import { db } from "../../config";
 import { serviceRequests } from "./requests.schema";
 import { services } from "../services/service.schema";
@@ -200,6 +200,23 @@ export async function serviceExists(id: string): Promise<boolean> {
     .where(eq(services.id, id))
     .limit(1);
   return result.length > 0;
+}
+
+export async function findActiveForUser(
+  userId: string,
+  limit = 10,
+): Promise<RequestRow[]> {
+  return db
+    .select()
+    .from(serviceRequests)
+    .where(
+      and(
+        eq(serviceRequests.userId, userId),
+        inArray(serviceRequests.status, ["open", "in_progress"]),
+      ),
+    )
+    .orderBy(desc(serviceRequests.createdAt))
+    .limit(limit);
 }
 
 export async function getRecentCases() {

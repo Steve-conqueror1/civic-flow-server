@@ -113,4 +113,28 @@ export const servicesData = [
     minResponseDays: 2,
     maxResponseDays: 3,
   },
+  {
+    name: "General Inquiry",
+    slug: "general-inquiry",
+    description:
+      "Submit a general question or request that does not fit into a specific service category.",
+    instructions:
+      "Provide as much detail as possible so we can direct your request to the appropriate department.",
+    categorySlug: "other",
+    departmentSlug: "general-help",
+    minResponseDays: 2,
+    maxResponseDays: 4,
+  },
+  {
+    name: "Website or App Feedback",
+    slug: "website-app-feedback",
+    description:
+      "Report issues or provide feedback about the CivicFlow platform or website.",
+    instructions:
+      "Describe the issue or suggestion, including screenshots if applicable.",
+    categorySlug: "other",
+    departmentSlug: "general-help",
+    minResponseDays: 1,
+    maxResponseDays: 3,
+  },
 ];
