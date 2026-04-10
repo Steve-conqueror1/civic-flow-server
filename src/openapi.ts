@@ -27,6 +27,7 @@ export const openApiSpec = swaggerJSDoc({
         description: "Citizen service requests and tracking",
       },
       { name: "Contact", description: "Contact enquiries" },
+      { name: "Geocode", description: "Location search and geocoding" },
     ],
     components: {
       securitySchemes: {
