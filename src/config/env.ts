@@ -32,6 +32,7 @@ const envSchema = z.object({
   OPENAI_API_KEY: z.string().min(1),
 
   TURNSTILE_SECRET: z.string().min(1),
+  MAPBOX_TOKEN: z.string().min(1),
 });
 
 const parsed = envSchema.safeParse(process.env);
